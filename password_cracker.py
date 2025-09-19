@@ -6,13 +6,21 @@ from time import time
 import hashlib, passlib, os
 
 def sha256_handler(pass_list: list, file: str):
+    attempts = 0
     with open(file, 'r') as hash_file:
-        hashes = hash_file.readlines()
-        for hash in hashes:
-            if hash:
-                sep_hash = hash.split('$')
-                password_hash = sep_hash[1]
-                print("found hash:", password_hash)
+        for line in hash_file:
+            if not line.strip():
+                continue
+            salt, password_hash = line.strip().split('$')
+
+            #brute force
+            for password in pass_list:
+                attempts += 1
+                password_bytes = password.encode()
+                candidate_hash = hashlib.sha256(salt.encode() + password_bytes).hexdigest()
+                if password_hash == candidate_hash:
+                    print(f"Found password: {password} for hash {password_hash} after {attempts} attempts")
+                    return
 
 def pbkdf2_handler(pass_list: list, file: str):
     print("pbkdf2 was called")
@@ -35,7 +43,7 @@ def main():
     #random order cracking
     hash_reader(random_pass_lex)
     #lexographic order cracking
-    hash_reader(all_pass_lex)
+    #hash_reader(all_pass_lex)
 
 if __name__ == "__main__":
     main()
