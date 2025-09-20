@@ -3,13 +3,22 @@ from string import ascii_lowercase as letters
 from itertools import product
 from random import shuffle
 from time import time
-import hashlib, passlib, os
+import hashlib, os
+from passlib.hash import pbkdf2_sha256
 
 
 def sha256_handler(pass_list: list, file: str):
+    """
+    Brute force hashes in SHA256 file.
+
+    :param pass_list: Passwords to try
+    :param file: Path to text file containing SHA256 hashes
+    :return: Cracked Passwords found in file
+    """
     attempts = 0
     start_time = time()
     found_passwords = set()
+
     with open(file, 'r') as hash_file:
         for line in hash_file:
             if not line.strip():
@@ -21,17 +30,23 @@ def sha256_handler(pass_list: list, file: str):
                 candidate_hash = hashlib.sha256(salt_bytes + password.encode("utf-8")).hexdigest()
                 if candidate_hash == password_hash:
                     end_time = time()
-                    print(f"[+] Found password: {password} in {attempts} attempts inside of file {file}. It took {round((end_time - start_time), 2)} seconds.")
+                    print(f"[+] Found password: {password} in {attempts} attempts inside of file {file}. Took {round((end_time - start_time), 2)} seconds.")
                     found_passwords.add(password)
     return found_passwords
  
 
-
-
 def pbkdf2_handler(pass_list: list, file: str):
-    print("pbkdf2 was called")
+    print("PBKDF2 detected...")
+
 
 def hash_reader(pass_list: list):
+    """
+    Discover and process all hash files in the current directory. Iterates
+    through the files in current directory. If file contains "sha256) pass
+    to handler. If filename contains Pbkdf2 pass to pbkdf2 handler.
+
+    :param pass_list: Password list
+    """
     program_dir = os.path.dirname(__file__)
     entries = os.listdir(program_dir)
     for file in entries:
@@ -50,6 +65,9 @@ def hash_reader(pass_list: list):
 
 
 def main():
+    """
+    Main function, generates all 5-character lowercase strings.
+    """
     # all possible passwords
     all_pass_lex = [''.join(c) for c in product(letters, repeat=5)]
     random_pass_lex = all_pass_lex[:]
