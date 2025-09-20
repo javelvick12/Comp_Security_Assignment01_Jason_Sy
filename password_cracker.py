@@ -5,22 +5,28 @@ from random import shuffle
 from time import time
 import hashlib, passlib, os
 
+
 def sha256_handler(pass_list: list, file: str):
     attempts = 0
+    start_time = time()
+    found_passwords = set()
     with open(file, 'r') as hash_file:
         for line in hash_file:
             if not line.strip():
                 continue
             salt, password_hash = line.strip().split('$')
-
-            #brute force
+            salt_bytes = bytes.fromhex(salt)
             for password in pass_list:
                 attempts += 1
-                password_bytes = password.encode()
-                candidate_hash = hashlib.sha256(salt.encode() + password_bytes).hexdigest()
-                if password_hash == candidate_hash:
-                    print(f"Found password: {password} for hash {password_hash} after {attempts} attempts")
-                    return
+                candidate_hash = hashlib.sha256(salt_bytes + password.encode("utf-8")).hexdigest()
+                if candidate_hash == password_hash:
+                    end_time = time()
+                    print(f"[+] Found password: {password} in {attempts} attempts inside of file {file}. It took {round((end_time - start_time), 2)} seconds.")
+                    found_passwords.add(password)
+    return found_passwords
+ 
+
+
 
 def pbkdf2_handler(pass_list: list, file: str):
     print("pbkdf2 was called")
@@ -30,7 +36,15 @@ def hash_reader(pass_list: list):
     entries = os.listdir(program_dir)
     for file in entries:
         if "sha256" in file:
-            sha256_handler(pass_list, file)
+            found_passwords = sha256_handler(pass_list, file)
+            if "hash1" in file:
+                file_name = "password1.txt"
+            elif "hash2" in file:
+                file_name = "password2.txt"
+            with open(file_name, 'w') as f:
+                for password in found_passwords:
+                    f.write(password + "\n")
+
         elif "pbkdf2" in file:
             pbkdf2_handler(pass_list, file)
 
