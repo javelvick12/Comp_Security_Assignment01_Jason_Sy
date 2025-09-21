@@ -7,6 +7,8 @@ import hashlib, os
 from passlib.hash import pbkdf2_sha256
 
 
+
+
 def sha256_handler(pass_list: list, file: str):
     """
     Brute force hashes in SHA256 file.
@@ -36,7 +38,49 @@ def sha256_handler(pass_list: list, file: str):
  
 
 def pbkdf2_handler(pass_list: list, file: str):
-    print("PBKDF2 detected...")
+    """
+    Processes pbkdf2-SHA256 files attempts to brute force. WILL TIMEOUT.
+
+    :param pass_list: list of passwords
+    :param file: path to file
+    :return: set of plaintext passwords and attempts taken. WILL TIMEOUT for testing.
+    """
+
+    TIMEOUT= 10.0
+    attempts = 0
+    start_time = time()
+    found_passwords = set()
+
+    with open(file, 'r') as hash_file:
+        for lineno, raw in enumerate(hash_file, start=1):
+            line = raw.strip()
+            if not line:
+                continue
+
+            per_hash_start = time()
+            timed_out = False
+            for password in pass_list:
+                if (time() - per_hash_start) >= TIMEOUT:
+                    timed_out = True
+                    break
+
+                attempts += 1
+                try:
+                    if pbkdf2_sha256.verify(password, line):
+                        end_time = time()
+                        print(f"[+]{file}: Found Password: {password} in {attempts} attempts. Took {round((end_time - start_time), 2)}s")
+                        found_passwords.add(password)
+                        break
+                except Exception as e:
+                    print(f"{file}: Invalid line: {lineno}")
+                    break
+
+            if timed_out and (password not in found_passwords):
+                elapsed = round(time() - per_hash_start, 2)
+                print(f"[~] Timeout on {file} line {lineno} after {elapsed}s and "
+                      f"{attempts} total attempts so far.")
+
+    return found_passwords
 
 
 def hash_reader(pass_list: list):
