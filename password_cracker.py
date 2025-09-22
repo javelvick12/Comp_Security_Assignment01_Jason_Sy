@@ -17,12 +17,13 @@ def sha256_handler(pass_list: list, file: str):
     :param file: Path to text file containing SHA256 hashes
     :return: Cracked Passwords found in file
     """
-    attempts = 0
-    start_time = time()
+    attempt_totals = []
     found_passwords = set()
-
+    time_totals = []
     with open(file, 'r') as hash_file:
         for line in hash_file:
+            attempts = 0
+            start_time = time()
             if not line.strip():
                 continue
             salt, password_hash = line.strip().split('$')
@@ -32,9 +33,12 @@ def sha256_handler(pass_list: list, file: str):
                 candidate_hash = hashlib.sha256(salt_bytes + password.encode("utf-8")).hexdigest()
                 if candidate_hash == password_hash:
                     end_time = time()
-                    print(f"[+] Found password: {password} in {attempts} attempts inside of file {file}. Took {round((end_time - start_time), 2)} seconds.")
+                    total_time = round((end_time - start_time), 2)
+                    print(f"[+] Found password: {password} in {attempts} attempts inside of file {file}. Took {total_time} seconds.")
+                    attempt_totals.append(attempts)
+                    time_totals.append(total_time)
                     found_passwords.add(password)
-    return found_passwords
+    return found_passwords, attempt_totals, time_totals
  
 
 def pbkdf2_handler(pass_list: list, file: str):
@@ -95,7 +99,7 @@ def hash_reader(pass_list: list):
     entries = os.listdir(program_dir)
     for file in entries:
         if "sha256" in file:
-            found_passwords = sha256_handler(pass_list, file)
+            found_passwords, attempt_totals, time_totals = sha256_handler(pass_list, file)
             if "hash1" in file:
                 file_name = "password1.txt"
             elif "hash2" in file:
@@ -103,6 +107,8 @@ def hash_reader(pass_list: list):
             with open(file_name, 'w') as f:
                 for password in found_passwords:
                     f.write(password + "\n")
+                f.write(f"Average ATC: {round(sum(attempt_totals)/len(attempt_totals),2)} \n")
+                f.write(f"Average TTC: {round(sum(time_totals)/len(time_totals),2)} \n")
 
         elif "pbkdf2" in file:
             pbkdf2_handler(pass_list, file)
@@ -117,9 +123,9 @@ def main():
     random_pass_lex = all_pass_lex[:]
     shuffle(random_pass_lex)
     #random order cracking
-    hash_reader(random_pass_lex)
+    #hash_reader(random_pass_lex)
     #lexographic order cracking
-    #hash_reader(all_pass_lex)
+    hash_reader(all_pass_lex)
 
 if __name__ == "__main__":
     main()

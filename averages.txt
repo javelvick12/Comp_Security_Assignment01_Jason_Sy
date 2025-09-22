@@ -1,0 +1,11 @@
+SHA256 TTC and ATC Averages:
+
+Random shuffle run:
+Average ATC: 5993646.9 per hash
+
+Average TTC: 3.22 per hash
+
+Lexographic run:
+Average ATC: 4708090.26 per hash
+
+Average TTC: 1.98 per hash
