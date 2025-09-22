@@ -120,8 +120,8 @@ def main():
     """
     # all possible passwords
     all_pass_lex = [''.join(c) for c in product(letters, repeat=5)]
-    random_pass_lex = all_pass_lex[:]
-    shuffle(random_pass_lex)
+    #random_pass_lex = all_pass_lex[:]
+    #shuffle(random_pass_lex)
     #random order cracking
     #hash_reader(random_pass_lex)
     #lexographic order cracking
