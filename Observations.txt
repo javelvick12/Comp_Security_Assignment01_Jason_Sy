@@ -1,0 +1,7 @@
+1. The Average Attempts to Crack did end up being around half of the total possible values for the randomized run. Since the total values was 11,881,376 and the average attempts ended up being 5,993,646, that is indeed about half of the total values or N/2.
+
+2. Yes, Random brute forcing takes a decently longer amount of time. This is likely because when the values are randomized, they end up having an equal chance of ending up in any place in the list, while in the lexographic order, it ends up being more likely to be toward the front of the list.
+
+3. A random password is more effective because an attacker will have a harder time comparing random hashes to a list of pre-computed/common hashes that are known to be associated with common human passwords. Can also make it harder for an attacker to use dictionary attacks and potentially making the salt more effective as both the salt and the hash will be random and not common patterns that have been determined before.
+
+4. Cracking the pbkdf2 hashes takes significantly longer than cracking the sha256 hashes. It takes hours for one hash versus seconds for one sha256 hash. Cracking pbkdf2 hashing takes much more computational power and will discourage attackers from pouring in the time and resources to brute force these kinds of hashes.

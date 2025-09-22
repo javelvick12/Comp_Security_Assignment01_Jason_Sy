@@ -50,7 +50,7 @@ def pbkdf2_handler(pass_list: list, file: str):
     :return: set of plaintext passwords and attempts taken. WILL TIMEOUT for testing.
     """
 
-    TIMEOUT= 10.0
+    TIMEOUT= 600000000000
     attempts = 0
     start_time = time()
     found_passwords = set()
@@ -60,7 +60,6 @@ def pbkdf2_handler(pass_list: list, file: str):
             line = raw.strip()
             if not line:
                 continue
-
             per_hash_start = time()
             timed_out = False
             for password in pass_list:
@@ -98,6 +97,7 @@ def hash_reader(pass_list: list):
     program_dir = os.path.dirname(__file__)
     entries = os.listdir(program_dir)
     for file in entries:
+        """
         if "sha256" in file:
             found_passwords, attempt_totals, time_totals = sha256_handler(pass_list, file)
             if "hash1" in file:
@@ -109,8 +109,8 @@ def hash_reader(pass_list: list):
                     f.write(password + "\n")
                 f.write(f"Average ATC: {round(sum(attempt_totals)/len(attempt_totals),2)} \n")
                 f.write(f"Average TTC: {round(sum(time_totals)/len(time_totals),2)} \n")
-
-        elif "pbkdf2" in file:
+                """
+        if "pbkdf2" in file:
             pbkdf2_handler(pass_list, file)
 
 
@@ -120,8 +120,8 @@ def main():
     """
     # all possible passwords
     all_pass_lex = [''.join(c) for c in product(letters, repeat=5)]
-    #random_pass_lex = all_pass_lex[:]
-    #shuffle(random_pass_lex)
+    random_pass_lex = all_pass_lex[:]
+    shuffle(random_pass_lex)
     #random order cracking
     #hash_reader(random_pass_lex)
     #lexographic order cracking

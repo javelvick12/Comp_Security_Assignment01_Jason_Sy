@@ -9,3 +9,9 @@ Lexicographic run:
 Average ATC: 4708090.26 per hash
 
 Average TTC: 1.98 per hash
+
+PBKDF2 TTC and ATC Averages:
+
+N/A
+
+Due to even one hash of PBKDF2 SHA256 taking a very long time (can be hours for one hash), we could not run the same process for the PBKDF2 hashes with the same process we did for the SHA256 hashes.
